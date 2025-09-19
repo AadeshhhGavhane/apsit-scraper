@@ -1,0 +1,25 @@
+[project]
+name = "apsit-scraper"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "asyncio>=3.4.3",
+    "crawl4ai>=0.7.0",
+    "google-generativeai>=0.8.5",
+    "langchain>=0.3.26",
+    "langchain-community>=0.3.27",
+    "langchain-core>=0.3.68",
+    "langchain-google-genai>=2.0.10",
+    "langchain-mistralai>=0.1.0",
+    "langchain-pinecone>=0.2.8",
+    "markdownify>=1.1.0",
+    "openai>=1.95.1",
+    "pinecone>=7.3.0",
+    "psutil>=7.0.0",
+    "python-dotenv>=1.1.1",
+    "streamlit>=1.46.1",
+    "qdrant-client>=1.11.1",
+    "ollama>=0.3.0",
+]
