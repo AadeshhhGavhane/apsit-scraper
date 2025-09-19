@@ -1,0 +1,247 @@
+{
+  "name": "apsit-faculty-helpdesk",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -192,
+        192
+      ],
+      "id": "df8d074c-dcee-465c-bbdf-d9b4507e1d05",
+      "name": "gemini-2.5-flash",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "JjrbPxLvSxgXhhv1",
+          "name": "aadesh"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.body.session_id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -16,
+        224
+      ],
+      "id": "5e832ecc-1e93-4029-aeec-5bc031ff2e79",
+      "name": "memory"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.body.message }}",
+        "options": {
+          "systemMessage": "=You are the **APSIT Faculty Help Desk Assistant**.\nYour purpose is to help students get **relevant and accurate information about all faculty members in APSIT College**.\n\n### Role & Behavior\n\n* Always respond in a **professional, polite, and helpful tone**.\n* When a student asks about APSIT College or its faculty, you must use the tool: **`faculty_search`**.\n* After querying with `faculty_search`, provide the retrieved information clearly and concisely.\n\n### Constraints & Fallback\n\n* If you cannot find the answer or the requested information is unavailable, politely advise the student to check the official website: **[apsit.edu.in](https://apsit.edu.in)**.\n* Never make up information about faculty or APSIT.\n\n### Example Style\n\n* ✅ *\"I found the details for Prof. XYZ from the Computer Engineering Department. Here are the highlights...\"*\n* ❌ Do not speculate or provide unverified information.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        -16,
+        -16
+      ],
+      "id": "69f12338-3b7a-4a7f-8394-9fb8393cff9f",
+      "name": "apsit-faculty-helpdesk"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsMistralCloud",
+      "typeVersion": 1,
+      "position": [
+        176,
+        336
+      ],
+      "id": "49a9bbb5-7826-4be7-b5d0-22c97acefc59",
+      "name": "Embeddings Mistral Cloud",
+      "credentials": {
+        "mistralCloudApi": {
+          "id": "JgmZOxDG0GT2yNot",
+          "name": "premraval"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Find Faculty Information",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "apsit-faculty-helpdesk",
+          "mode": "list",
+          "cachedResultName": "apsit-faculty-helpdesk"
+        },
+        "topK": 10,
+        "options": {
+          "pineconeNamespace": "apsit-profs-details"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        272,
+        176
+      ],
+      "id": "6d77ca65-d533-4a6d-9496-81b7e1eb93de",
+      "name": "faculty_search",
+      "credentials": {
+        "pineconeApi": {
+          "id": "080VbHt7m7fqMMhU",
+          "name": "PineconeApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "chat",
+        "authentication": "headerAuth",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -256,
+        -16
+      ],
+      "id": "26aaed40-0ead-4558-ba0a-a19d395ff5d8",
+      "name": "Webhook",
+      "webhookId": "5fe77a4f-72c5-45c9-abe8-f92ae3dd626c",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "c5mJ8o7bDGkPNath",
+          "name": "apsit-faculty-helpdesk"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        432,
+        -16
+      ],
+      "id": "faa3362e-bd4e-4113-96ec-8268e6637c78",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "model": "deepseek-r1-distill-llama-70b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        1344,
+        224
+      ],
+      "id": "d735b358-07b2-47a2-a263-ea7567427d61",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "58vxhMGBLpFPrnqH",
+          "name": "Groq account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "gemini-2.5-flash": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "apsit-faculty-helpdesk",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "apsit-faculty-helpdesk",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Mistral Cloud": {
+      "ai_embedding": [
+        [
+          {
+            "node": "faculty_search",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "faculty_search": {
+      "ai_tool": [
+        [
+          {
+            "node": "apsit-faculty-helpdesk",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "apsit-faculty-helpdesk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "apsit-faculty-helpdesk": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        []
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "741ad03a-8446-44fc-b51d-3e365494324d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8298c403f4202fd61868c20ed97b7fad63cdc7d9af33f0b7e11c9b75ea18e3e1"
+  },
+  "id": "nXt1xIPGT6ye0uqK",
+  "tags": []
+}
